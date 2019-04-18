@@ -1,5 +1,6 @@
-import React, { Component, PropTypes } from 'react'
-import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react'
+import React, { Component} from 'react'
+import { Form, Grid, Header, Segment } from 'semantic-ui-react'
+import { Redirect } from 'react-router-dom'
 import axios from 'axios'
 
 class Register extends Component {
@@ -12,7 +13,6 @@ class Register extends Component {
     }
 
     handleSubmit = event => {
-        console.log(this.state)
         event.preventDefault();
        
         axios.post(
@@ -22,15 +22,32 @@ class Register extends Component {
                 password: this.state.password
             }
           ).then(res => {
-            console.log(res)
+            axios.post(
+                'http://localhost:8001/api/v1/users/authenticate',
+                {
+                    username: this.state.username,
+                    password: this.state.password
+                }, {
+                    withCredentials: true
+                }
+            ).then(res => {
+                this.setState({loggedIn: true})
+            }).catch((err) => {
+                this.setState({error:err})
+            })
+        
           }).catch((err) => {
-            console.log(err)
+            this.setState({error:err})
       })
     }
 
     render() {
+        if (this.state.loggedIn === true) {
+            return <Redirect to='/' />
+        }
         return (
-            <div className='login-form'>
+            
+            <div className='login-form' style ={{marginTop:'100px'}}>
                 {/*
             Heads up! The styles below are necessary for the correct render of this example.
             You can do same with CSS, the main idea is that all the elements up to the `Grid`
@@ -71,8 +88,16 @@ class Register extends Component {
                                 </Form.Button>
                             </Segment>
                         </Form>
+                        {this.state.error &&
+                            <div class="ui negative message">
+                                
+                                    Couldn't Register With Supplied Credentials
+                        
+                            </div>
+                        }
                     </Grid.Column>
                 </Grid>
+                
             </div>
         );
     }

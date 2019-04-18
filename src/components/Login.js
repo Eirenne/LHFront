@@ -27,7 +27,7 @@ class Login extends Component {
         ).then(res => {
             this.setState({loggedIn: true})
         }).catch((err) => {
-            console.log(err)
+            this.setState({error:err})
         })
     }
 
@@ -36,12 +36,8 @@ class Login extends Component {
             return <Redirect to='/' />
         }
         return (
-            <div className='login-form'>
-                {/*
-            Heads up! The styles below are necessary for the correct render of this example.
-            You can do same with CSS, the main idea is that all the elements up to the `Grid`
-            below must have a height of 100%.
-            */}
+            <div className='login-form' style ={{marginTop:'100px'}}>
+                
                 <style>{`
             body > div,
             body > div > div,
@@ -80,6 +76,13 @@ class Login extends Component {
                         <Message>
                             New to us? <Link to='/register'>Sign Up</Link> 
                         </Message>
+                        {this.state.error &&
+                            <div class="ui negative message">
+                                
+                                    Couldn't Log In With Supplied Credentials
+                        
+                            </div>
+                        }
                     </Grid.Column>
                 </Grid>
             </div>
