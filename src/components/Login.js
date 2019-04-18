@@ -1,5 +1,6 @@
-import React, { Component, PropTypes } from 'react'
-import { Button, Form, Grid, Header, Image, Message, Segment } from 'semantic-ui-react'
+import React, { Component } from 'react'
+import {  Form, Grid, Header, Message, Segment } from 'semantic-ui-react'
+import { Redirect, Link } from 'react-router-dom'
 import axios from 'axios'
 
 class Login extends Component {
@@ -7,40 +8,33 @@ class Login extends Component {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loggedIn: false
         }
     }
 
     handleSubmit = event => {
-        console.log(this.state)
         event.preventDefault();
-       
+
         axios.post(
             'http://localhost:8001/api/v1/users/authenticate',
             {
                 username: this.state.username,
                 password: this.state.password
-            },{
+            }, {
                 withCredentials: true
             }
-          ).then(res => {
-            console.log(res)
-            axios.get(
-                'http://localhost:8001/api/v1/ping',
-                {
-                    withCredentials: true
-                }
-            ).then(res => {
-                console.log(res)
-            }).catch(err => {
-                console.log(err)
-            })
-          }).catch((err) => {
+        ).then(res => {
+            this.setState({loggedIn: true})
+        }).catch((err) => {
             console.log(err)
-      })
+        })
     }
 
     render() {
+        if (this.state.loggedIn === true) {
+            return <Redirect to='/' />
+        }
         return (
             <div className='login-form'>
                 {/*
@@ -67,7 +61,7 @@ class Login extends Component {
                                     fluid icon='user'
                                     iconPosition='left'
                                     placeholder='E-mail address'
-                                    onChange={(e) => this.setState({username: e.target.value})}
+                                    onChange={(e) => this.setState({ username: e.target.value })}
                                 />
                                 <Form.Input
                                     fluid
@@ -75,7 +69,7 @@ class Login extends Component {
                                     iconPosition='left'
                                     placeholder='Password'
                                     type='password'
-                                    onChange={(e) => this.setState({password: e.target.value})}
+                                    onChange={(e) => this.setState({ password: e.target.value })}
                                 />
 
                                 <Form.Button color='teal' fluid size='large' >
@@ -84,7 +78,7 @@ class Login extends Component {
                             </Segment>
                         </Form>
                         <Message>
-                            New to us? <a href='#'>Sign Up</a>
+                            New to us? <Link to='/register'>Sign Up</Link> 
                         </Message>
                     </Grid.Column>
                 </Grid>
